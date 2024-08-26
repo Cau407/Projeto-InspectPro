@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InspectPro - Sistema de Inspeção de Campo</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
+</head>
+<body>
+    <header>
+        <h1><i class="fas fa-clipboard-check"></i> InspectPro</h1>
+        <nav id="mainNav">
+            <button id="homeBtn" class="nav-btn"><i class="fas fa-home"></i> Início</button>
+            <button id="fiscalBtn" class="nav-btn"><i class="fas fa-hard-hat"></i> Fiscal</button>
+            <button id="gestorBtn" class="nav-btn"><i class="fas fa-chart-line"></i> Gestor</button>
+            <button id="visitanteBtn" class="nav-btn"><i class="fas fa-eye"></i> Visitante</button>
+        </nav>
+        <div id="userInfo" style="display: none;">
+            <span id="welcomeMessage"></span>
+            <button id="logoutBtn" class="nav-btn"><i class="fas fa-sign-out-alt"></i> Sair</button>
+        </div>
+    </header>
+
+    <main>
+        <section id="homeView" class="view">
+            <h2>Bem-vindo ao InspectPro</h2>
+            <div class="auth-container">
+                <div class="auth-tabs">
+                    <button class="auth-tab active" data-tab="login">Login</button>
+                    <button class="auth-tab" data-tab="register">Registrar</button>
+                </div>
+                <div id="loginForm" class="auth-form active">
+                    <h3>Login</h3>
+                    <form id="loginFormElement">
+                        <div class="form-group">
+                            <label for="loginUsername">Usuário:</label>
+                            <input type="text" id="loginUsername" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="loginPassword">Senha:</label>
+                            <input type="password" id="loginPassword" required>
+                        </div>
+                        <button type="submit" class="btn primary">Entrar</button>
+                    </form>
+                </div>
+                <div id="registerForm" class="auth-form">
+                    <h3>Registrar</h3>
+                    <form id="registerFormElement">
+                        <div class="form-group">
+                            <label for="registerUsername">Usuário:</label>
+                            <input type="text" id="registerUsername" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="registerPassword">Senha:</label>
+                            <input type="password" id="registerPassword" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="registerRole">Cargo:</label>
+                            <select id="registerRole" required>
+                                <option value="">Selecione um cargo</option>
+                                <option value="fiscal">Fiscal</option>
+                                <option value="gestor">Gestor</option>
+                                <option value="visitante">Visitante</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn primary">Registrar</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <section id="fiscalView" class="view">
+            <h2><i class="fas fa-book"></i> Relatórios do Fiscal</h2>
+            <div class="tab-container">
+                <button class="tab-btn active" data-tab="dro">DRO</button>
+                <button class="tab-btn" data-tab="rft">RFT</button>
+            </div>
+            <div id="droTab" class="tab-content active">
+                <h3>Diário de Obras (DRO)</h3>
+                <form id="droForm">
+                    <div class="form-group">
+                        <label for="droImage"><i class="fas fa-camera"></i> Foto da Obra:</label>
+                        <input type="file" id="droImage" accept="image/*" capture="camera">
+                    </div>
+                    <div class="form-group">
+                        <label for="droDescription"><i class="fas fa-tasks"></i> Atividades do dia:</label>
+                        <textarea id="droDescription" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="droLocation"><i class="fas fa-map-marker-alt"></i> Local da obra:</label>
+                        <input type="text" id="droLocation" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="droSignature"><i class="fas fa-signature"></i> Assinatura:</label>
+                        <canvas id="droSignature" class="signature-pad"></canvas>
+                        <button type="button" id="clearDroSignature" class="btn secondary">Limpar Assinatura</button>
+                    </div>
+                    <button type="button" id="copyPrevious" class="btn secondary"><i class="fas fa-copy"></i> Copiar do dia anterior</button>
+                    <button type="submit" class="btn primary"><i class="fas fa-save"></i> Salvar DRO</button>
+                </form>
+            </div>
+            <div id="rftTab" class="tab-content">
+                <h3>Relatório de Obra (RFT)</h3>
+                <form id="rftForm">
+                    <div class="form-group">
+                        <label for="rftImage"><i class="fas fa-camera"></i> Foto da Obra:</label>
+                        <input type="file" id="rftImage" accept="image/*" capture="camera">
+                    </div>
+                    <div class="form-group">
+                        <label for="rftDescription"><i class="fas fa-file-alt"></i> Descrição da obra:</label>
+                        <textarea id="rftDescription" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="rftProgress"><i class="fas fa-percentage"></i> Progresso (%):</label>
+                        <input type="number" id="rftProgress" min="0" max="100" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="rftIssues"><i class="fas fa-exclamation-triangle"></i> Problemas encontrados:</label>
+                        <textarea id="rftIssues"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="rftSignature"><i class="fas fa-signature"></i> Assinatura:</label>
+                        <canvas id="rftSignature" class="signature-pad"></canvas>
+                        <button type="button" id="clearRftSignature" class="btn secondary">Limpar Assinatura</button>
+                    </div>
+                    <button type="submit" class="btn primary"><i class="fas fa-save"></i> Salvar RFT</button>
+                </form>
+            </div>
+        </section>
+
+        <section id="gestorView" class="view">
+            <h2><i class="fas fa-chart-bar"></i> Visão do Gestor</h2>
+            <div id="gestorInfo" class="info-panel">
+                <p><i class="fas fa-calendar-day"></i> Data: <span id="currentDate"></span></p>
+                <p><i class="fas fa-map-pin"></i> Local: <span id="currentLocation">Carregando...</span></p>
+                <p><i class="fas fa-clock"></i> Hora: <span id="currentTime"></span></p>
+            </div>
+            <div id="gestorRelatorios">
+                <h3><i class="fas fa-list-alt"></i> Relatórios Recentes</h3>
+                <ul id="gestorRelatoriosList"></ul>
+            </div>
+        </section>
+
+        <section id="visitanteView" class="view">
+            <h2><i class="fas fa-file-alt"></i> Relatórios Disponíveis - Visitante</h2>
+            <ul id="visitanteRelatoriosList"></ul>
+        </section>
+    </main>
+
+    <div id="notification" class="notification"></div>
+
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Editar Relatório</h2>
+            <form id="editForm">
+                <div class="form-group">
+                    <label for="editDescription">Descrição:</label>
+                    <textarea id="editDescription" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="editLocation">Local:</label>
+                    <input type="text" id="editLocation">
+                </div>
+                <div class="form-group">
+                    <label for="editProgress">Progresso (%):</label>
+                    <input type="number" id="editProgress" min="0" max="100">
+                </div>
+                <div class="form-group">
+                    <label for="editIssues">Problemas:</label>
+                    <textarea id="editIssues"></textarea>
+                </div>
+                <button type="submit" class="btn primary">Salvar Alterações</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
